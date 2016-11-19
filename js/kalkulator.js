@@ -49,6 +49,7 @@ function create() {
     kalkulator = this.add.sprite(320, 500, 'kalkulator');
 
     game.physics.arcade.enable(kalkulator);
+    
 
     //  Tell the Weapon to track the 'player' Sprite, offset by 14px horizontally, 0 vertically
     weapon.trackSprite(kalkulator, 25, 0);
@@ -60,6 +61,7 @@ function create() {
     //  pointboxes
 
     pointBox = game.add.group();
+    pointBox.setAll('outOfBoundsKill', true);
 
     //place score text on the screen
     scoreText = game.add.text(5, 3, score, {fill:"#fff"});
@@ -85,6 +87,7 @@ function update() {
 
     pointBox.forEachAlive(function(pointBoxObj){
         pointBoxObj.body.velocity.y = 3500*pointBoxObj.speed;
+        game.physics.arcade.overlap(weapon, pointBoxObj, hitPoint);
     });
 
     if (game.time.now > pointBoxTime)
@@ -95,7 +98,7 @@ function update() {
 
     // createRandomPointbox(pointBox);
 
-    game.physics.arcade.overlap(weapon, pointBox, hitPoint);
+    
 
 }
 
@@ -116,7 +119,9 @@ function createRandomPointbox(pointBoxGroup){
 }
 
 
-function hitPoint(bullet, pointBox){
+function hitPoint(weapon, pointBox){
     score = score + pointBox.value;
     scoreText.text = score;
+    console.log("asdasd");
+    pointBox.kill();
 }
