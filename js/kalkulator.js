@@ -16,43 +16,29 @@ function preload() {
     game.load.image('number7', 'assets/number7.jpg');
     game.load.image('number8', 'assets/number8.jpg');
     game.load.image('number9', 'assets/number9.jpg');
+    game.load.image('particle', 'assets/particle.jpg');
 
 }
 
 var score = 0;
 var scoreText;
 var kalkulator;
-var weapon;
+var bullet;
 var cursors;
 var fireButton;
+var fireTime = 0;
 var pointBox;
 var pointBoxTime = 0;
+var emitter;
 
 function create() {
-
-    //  Creates 30 bullets, using the 'bullet' graphic
-    weapon = game.add.weapon(30, 'bullet');
-
-    //  The bullet will be automatically killed when it leaves the world bounds
-    weapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
-
-    //  Because our bullet is drawn facing up, we need to offset its rotation:
-    weapon.bulletAngleOffset = 90;
-
-    //  The speed at which the bullet is fired
-    weapon.bulletSpeed = 400;
-
-    //  Speed-up the rate of fire, allowing them to shoot 1 bullet every 60ms
-    weapon.fireRate = 60;
+    game.physics.startSystem(Phaser.Physics.ARCADE);
 
     
     kalkulator = this.add.sprite(320, 500, 'kalkulator');
-
-    game.physics.arcade.enable(kalkulator);
+    game.physics.enable(kalkulator, Phaser.Physics.ARCADE);
     
-
-    //  Tell the Weapon to track the 'player' Sprite, offset by 14px horizontally, 0 vertically
-    weapon.trackSprite(kalkulator, 25, 0);
+    kalkulator.body.collideWorldBounds = true;
 
     cursors = this.input.keyboard.createCursorKeys();
 
@@ -61,10 +47,22 @@ function create() {
     //  pointboxes
 
     pointBox = game.add.group();
-    pointBox.setAll('outOfBoundsKill', true);
+    game.physics.enable(pointBox, Phaser.Physics.ARCADE);
+
+    bullet = game.add.group();
+    game.physics.enable(bullet, Phaser.Physics.ARCADE);
+
 
     //place score text on the screen
     scoreText = game.add.text(5, 3, score, {fill:"#fff"});
+
+    game.physics.arcade.overlap(bullet, pointBox, hitPoint);
+
+
+    emitter = game.add.emitter(0, 0, 100);
+
+    emitter.makeParticles('particle');
+    emitter.gravity = 200;
 }
 
 function update() {
@@ -82,13 +80,28 @@ function update() {
 
     if (fireButton.isDown)
     {
-        weapon.fire();
+        if (game.time.now > fireTime)
+        {
+            fireBullet();
+            fireTime = game.time.now + 200;
+        }
     }
 
     pointBox.forEachAlive(function(pointBoxObj){
         pointBoxObj.body.velocity.y = 3500*pointBoxObj.speed;
-        game.physics.arcade.overlap(weapon, pointBoxObj, hitPoint);
     });
+
+    bullet.forEachAlive(function(bulletObj){
+        bulletObj.body.velocity.y = -500;
+    });
+
+    // pointBox.forEachAlive(function(pointBoxObj){
+    //     bullet.forEachAlive(function(bulletObj){
+    //         game.physics.arcade.overlap(bulletObj, pointBoxObj, hitPoint);
+    //     });
+    // });
+
+    game.physics.arcade.overlap(bullet, pointBox, hitPoint);
 
     if (game.time.now > pointBoxTime)
     {
@@ -97,8 +110,6 @@ function update() {
     }
 
     // createRandomPointbox(pointBox);
-
-    
 
 }
 
@@ -114,14 +125,28 @@ function createRandomPointbox(pointBoxGroup){
     var randomInteger = game.rnd.integerInRange(0, 9);
     var newPointBox = pointBoxGroup.create(width*Math.random(), -50, 'number'+randomInteger);
     newPointBox.value = randomInteger;
-    newPointBox.speed = randomInteger/100;
-    game.physics.arcade.enable(newPointBox);
+    newPointBox.speed = (randomInteger+1)/100;
+    newPointBox.outOfBoundsKill = true;
+    newPointBox.anchor.set(0.5);
+    game.physics.enable(newPointBox, Phaser.Physics.ARCADE);
+}
+
+function fireBullet(){
+    //  hesap makinesinin mevcut konumuna göre bir mermi üretip, yukarı doğru gitmesini sağlayacağız
+    var newBullet = bullet.create(kalkulator.x+20, height-100, 'bullet');
+    game.physics.enable(newBullet, Phaser.Physics.ARCADE);
+
 }
 
 
-function hitPoint(weapon, pointBox){
+function hitPoint(bullet, pointBox){
+    console.log("asdasd");
     score = score + pointBox.value;
     scoreText.text = score;
     console.log("asdasd");
+    emitter.x = pointBox.x;
+    emitter.y = pointBox.y;
     pointBox.kill();
+    bullet.kill();
+    emitter.start(true, 2000, null, 10);
 }
