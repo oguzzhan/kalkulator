@@ -34,6 +34,8 @@ var kalkulator;
 var bullet;
 var cursors;
 var fireButton;
+var weaponOneButton;
+var weaponTwoButton;
 var fireTime = 0;
 var pointBox;
 var pointBoxTime = 0;
@@ -59,6 +61,8 @@ function create() {
     cursors = this.input.keyboard.createCursorKeys();
 
     fireButton = this.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR);
+    weaponOneButton = this.input.keyboard.addKey(Phaser.KeyCode.Z);
+    weaponTwoButton = this.input.keyboard.addKey(Phaser.KeyCode.X);
 
     //  pointboxes
 
@@ -91,17 +95,40 @@ function update() {
     if (cursors.left.isDown)
     {
         kalkulator.body.velocity.x = -400;
+        weaponOne.sprite.body.velocity.x = -400;
+        weaponTwo.sprite.body.velocity.x = -400;
     }
     else if (cursors.right.isDown)
     {
         kalkulator.body.velocity.x = 400;
+        weaponOne.sprite.body.velocity.x = 400;
+        weaponTwo.sprite.body.velocity.x = 400;
+    }else {
+        weaponOne.sprite.body.velocity.x=0;
+        weaponTwo.sprite.body.velocity.x=0;
     }
 
     if (fireButton.isDown)
     {
         if (game.time.now > fireTime)
         {
-            fireBullet();
+            fireBullet(weaponOne);
+            fireTime = game.time.now + 200;
+        }
+    }
+    if (weaponOneButton.isDown)
+    {
+        if (game.time.now > fireTime)
+        {
+            fireBullet(weaponOne);
+            fireTime = game.time.now + 200;
+        }
+    }
+    if (weaponTwoButton.isDown)
+    {
+        if (game.time.now > fireTime)
+        {
+            fireBullet(weaponTwo);
             fireTime = game.time.now + 200;
         }
     }
@@ -121,6 +148,7 @@ function update() {
         createRandomPointbox(pointBox);
         pointBoxTime = game.time.now + 2000;
     }
+    
 }
 
 function render() {
@@ -139,12 +167,13 @@ function createRandomPointbox(pointBoxGroup){
     game.physics.enable(newPointBox, Phaser.Physics.ARCADE);
 }
 
-function fireBullet(){
+function fireBullet(weapon){
     //  hesap makinesinin mevcut konumuna göre bir mermi üretip, yukarı doğru gitmesini sağlayacağız
-    var newBullet = bullet.create(kalkulator.x+20, height-100, bulletTypes[weaponOne.bulletType].sprite);
-    newBullet.operationType = bulletTypes[weaponOne.bulletType].name;
+    var newBullet = bullet.create(kalkulator.x+20, height-100, bulletTypes[weapon.bulletType].sprite);
+    newBullet.operationType = bulletTypes[weapon.bulletType].name;
     game.physics.enable(newBullet, Phaser.Physics.ARCADE);
-    assignRandomBulletToWeapon(weaponOne);
+    assignRandomBulletToWeapon(weapon);
+    
 }
 
 
@@ -163,7 +192,7 @@ function hitPoint(bullet, pointBox){
     }else {
         return 0;
     }
-
+    score = Math.round(score);
     scoreText.text = score;
     emitter.x = pointBox.x;
     emitter.y = pointBox.y;
@@ -173,7 +202,14 @@ function hitPoint(bullet, pointBox){
 }
 
 function assignRandomBulletToWeapon(weapon){
+    var addToX = 0;
+    if (weapon==weaponTwo){
+        addToX = 25;
+    }
     var randomBulletId = game.rnd.integerInRange(0, 3);
     weapon.bulletType = randomBulletId;
     // @todo: ilgili silahın görüntüsünü de hesap makinesinin yanına koymak lazım
+    if(weapon.sprite) weapon.sprite.kill();
+    weapon.sprite = game.add.sprite(kalkulator.x+addToX,kalkulator.y+45, bulletTypes[randomBulletId].weaponSprite  );
+    game.physics.enable(weapon.sprite, Phaser.Physics.ARCADE);
 }
