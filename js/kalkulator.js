@@ -25,9 +25,10 @@ function preload() {
     game.load.image('weaponMinus', 'assets/weaponMinus.jpg');
     game.load.image('weaponMultiple', 'assets/weaponMultiple.jpg');
     game.load.image('weaponDivide', 'assets/weaponDivide.jpg');
+    game.load.audio('music', ['audio/music.opus']);
+
 
 }
-
 var score = 0;
 var scoreText;
 var kalkulator;
@@ -48,11 +49,12 @@ var bulletTypes = [
     {id: 2, name: 'multiple', sprite: 'bulletMultiple', weaponSprite: 'weaponMultiple'},
     {id: 3, name: 'divide', sprite: 'bulletDivide', weaponSprite: 'weaponDivide'}
 ];
-
 function create() {
     game.physics.startSystem(Phaser.Physics.ARCADE);
 
-    
+    music = game.add.audio('music');
+    music.play();
+
     kalkulator = this.add.sprite(320, 500, 'kalkulator');
     game.physics.enable(kalkulator, Phaser.Physics.ARCADE);
     
@@ -114,6 +116,7 @@ function update() {
         {
             fireBullet(weaponOne);
             fireTime = game.time.now + 200;
+
         }
     }
     if (weaponOneButton.isDown)
@@ -142,6 +145,7 @@ function update() {
     });
 
     game.physics.arcade.overlap(bullet, pointBox, hitPoint);
+
 
     if (game.time.now > pointBoxTime)
     {
@@ -173,6 +177,7 @@ function fireBullet(weapon){
     newBullet.operationType = bulletTypes[weapon.bulletType].name;
     game.physics.enable(newBullet, Phaser.Physics.ARCADE);
     assignRandomBulletToWeapon(weapon);
+
     
 }
 
