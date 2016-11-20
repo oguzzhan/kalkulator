@@ -97,18 +97,14 @@ function update() {
     if (cursors.left.isDown)
     {
         kalkulator.body.velocity.x = -400;
-        weaponOne.sprite.body.velocity.x = -400;
-        weaponTwo.sprite.body.velocity.x = -400;
     }
     else if (cursors.right.isDown)
     {
         kalkulator.body.velocity.x = 400;
-        weaponOne.sprite.body.velocity.x = 400;
-        weaponTwo.sprite.body.velocity.x = 400;
-    }else {
-        weaponOne.sprite.body.velocity.x=0;
-        weaponTwo.sprite.body.velocity.x=0;
     }
+
+    weaponOne.sprite.x = kalkulator.x;
+    weaponTwo.sprite.x = kalkulator.x+25;
 
     if (fireButton.isDown)
     {
