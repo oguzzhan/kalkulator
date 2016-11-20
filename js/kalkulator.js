@@ -145,13 +145,20 @@ function fireBullet(){
 
 
 function hitPoint(bullet, pointBox){
-    //  @todo: bullet.operationType 'a göre if'e sokup işlem yapacağız
-    //  gelebilecek işlem tiplerini en tepedeki bulletTypes dizisi içindeki objelerin 'name' alanından kontrol edebiliriz
+
+    //Rastgele gelen işlemlere göre scrou hesaplamayı sorgulatıyoruz
 
     if(bullet.operationType=="plus"){
         score = score + pointBox.value;
+    }else if(bullet.operationType=="minus"){
+        score = score - pointBox.value;
+    }else if(bullet.operationType=="divide"){
+        score = score / pointBox.value;
+    }else if(bullet.operationType=="multiple"){
+        score = score * pointBox.value;
+    }else {
+        return 0;
     }
-    //  diğerleri eklenecek
 
     scoreText.text = score;
     emitter.x = pointBox.x;
