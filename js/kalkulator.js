@@ -21,6 +21,10 @@ function preload() {
     game.load.image('bulletMinus', 'assets/bulletMinus.jpg');
     game.load.image('bulletMultiple', 'assets/bulletMultiple.jpg');
     game.load.image('bulletDivide', 'assets/bulletDivide.jpg');
+    game.load.image('weaponPlus', 'assets/weaponPlus.jpg');
+    game.load.image('weaponMinus', 'assets/weaponMinus.jpg');
+    game.load.image('weaponMultiple', 'assets/weaponMultiple.jpg');
+    game.load.image('weaponDivide', 'assets/weaponDivide.jpg');
 
 }
 
